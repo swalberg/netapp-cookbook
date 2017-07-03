@@ -103,16 +103,20 @@ if defined?(ChefSpec)
     ChefSpec::Matchers::ResourceMatcher.new('netapp_volume', :delete, resource_name)
   end
 
-  def create_netapp_lun(resource_name)
-    ChefSpec::Matchers::ResourceMatcher.new('netapp_lun', :create, resource_name)
+   def create_netapp_lun(resource_name)
+     ChefSpec::Matchers::ResourceMatcher.new('netapp_lun', :create, resource_name)
+   end
+
+  def map_netapp_lun(resource_name)
+    ChefSpec::Matchers::ResourceMatcher.new('netapp_lun', :map, resource_name)
   end
 
-  def create_netapp_igroup(resource_name)
-    ChefSpec::Matchers::ResourceMatcher.new('netapp_igroup', :create, resource_name)
-  end
+   def create_netapp_igroup(resource_name)
+     ChefSpec::Matchers::ResourceMatcher.new('netapp_igroup', :create, resource_name)
+   end
 
-  def add_rule_netapp_igroup(resource_name)
-    ChefSpec::Matchers::ResourceMatcher.new('netapp_igroup', :add_rule, resource_name)
-  end
+   def add_rule_netapp_igroup(resource_name)
+     ChefSpec::Matchers::ResourceMatcher.new('netapp_igroup', :add_rule, resource_name)
+   end
 
 end

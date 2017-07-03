@@ -41,3 +41,24 @@ action :create do
    new_resource.updated_by_last_action(true) if resource_update
 
 end
+
+
+action :map do
+
+  # Create API Request.
+  netapp_lun_map_api = netapp_hash
+
+  netapp_lun_map_api[:api_name] = "lun-map"
+  netapp_lun_map_api[:resource] = "lun"
+  netapp_lun_map_api[:action] = "map"
+  netapp_lun_map_api[:svm] = new_resource.svm
+  #netapp_lun_map_api[:api_attribute]["lun"] = new_resource.name
+  netapp_lun_map_api[:api_attribute]["path"] = new_resource.name
+  netapp_lun_map_api[:api_attribute]["initiator-group"] = new_resource.igroup
+  netapp_lun_map_api[:api_attribute]["lun-id"] = new_resource.id
+
+   # Invoke NetApp API.
+    resource_update = invoke(netapp_lun_map_api)
+    new_resource.updated_by_last_action(true) if resource_update
+
+end

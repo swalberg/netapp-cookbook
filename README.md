@@ -201,7 +201,7 @@ This resource has the following actions:
 ### Attributes ###
 This resource has the following attributes:
 
-* `name` name attribute. Required. SVM names can contain a period (.), a hyphen (-), or an underscore (_), but must not start with a hyphen, period, or number. The maximum number of characters allowed in SVM names is 47.
+* `name` name attribute. Required. SVM names can contain a period (.), a hyphen (-), or an underscore ( _ ), but must not start with a hyphen, period, or number. The maximum number of characters allowed in SVM names is 47.
 * `nsswitch` Required.
 * `volume` Required
 * `aggregate` Required. Aggregate on which you want to create the root volume for the SVM. The default aggregate name is used if you do not specify one.
@@ -423,6 +423,92 @@ netapp_role '/bar' do
 end
 ````
 
+netapp_igroup
+------------
+SVM-management of igroup creation. Creating the igroup and the initiator is a pre-requisite for the lun.
+
+### Actions ###
+This resource has the following actions:
+
+* `:create` Default.
+* `:add_rule` add rule to the igroup
+
+### Attributes ###
+This resource has the following attributes:
+
+* `name` string, name attribute. Volume name. Required.
+* `svm` string. Name of managed SVM. Required
+* `ostype` string. Required "linux", "windows"
+* `igroup_type` string "iscsi". Required
+* `initiator` string. Required. Example: "iqn.1998-01.com.vmware:t1esx152-132-431b8380"
+
+### Example ###
+
+````ruby
+#Igroup create
+  netapp_igroup node['igroup']['name'] do
+    svm             node['netapp']['vserver']
+    igroup_type     node['igroup']['igroup_type']
+    ostype          node['igroup']['ostype']
+    action :create
+ end
+
+#Igroup add initiator
+  netapp_igroup node['igroup']['name'] do
+    svm             node['netapp']['vserver']
+    initiator       node['igroup']['initiator']
+    action :add_rule
+ end
+
+````
+
+
+netapp_lun
+------------
+SVM-management of lun creation. Creating the igroup, and volume are pre-requisites necesarry for creation.
+
+### Actions ###
+This resource has the following actions:
+
+* `:create` Default.
+* `:map` map the lun created if the igroup is created
+
+### Attributes ###
+This resource has the following attributes:
+
+* `name` string, name attribute. Volume name. Required.
+* `svm` string. Name of managed SVM. Required
+* `size` string. Required "50g"
+* `path` string Path of the SVM volume and lun. Required
+* `igroup` string. Required.
+* `id` string the id where the lun is created. Required.
+
+
+### Example ###
+
+````ruby
+   lpath = "/vol/"+vol[:name]+"/"+lun[:name]
+   netapp_lun       lpath do
+     svm               node['netapp']['vserver']
+     igroup            "iscsi_#{node['hostname']}_#{node['ipaddress']}"
+     id                lun['id'].to_s
+
+     action :nothing
+   end
+
+     netapp_lun lun do
+      svm               node['netapp']['vserver']
+      path             lpath
+      size              ((lun['lsize']*1024**3).to_i).to_s
+      ostype            vol['ostype']
+      comment           node['volume']['comment']
+      allocation        node['lun']['allocation']
+      reservation       node['lun']['reservation']
+      action :create
+      notifies :map, "netapp_lun[#{lpath}]", :immediately
+    end
+
+````
 
 
 Contributing

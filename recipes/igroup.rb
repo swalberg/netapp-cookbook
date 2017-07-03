@@ -1,3 +1,6 @@
+# Cookbook Name:: netapp
+# Recipe:: igroup
+
 #Igroup create
   netapp_igroup node['igroup']['name'] do
     svm             node['netapp']['vserver']
